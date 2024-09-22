@@ -1,0 +1,25 @@
+# 使用する Node.js のベースイメージ
+FROM node:20-alpine AS build
+
+WORKDIR /frontend
+
+COPY . .
+
+RUN npm install
+RUN npm run build
+# RUN npm run export
+
+CMD ["yarn", "start-production"]
+
+# # Nginx イメージを使用
+# FROM nginx:alpine
+
+# # ビルド成果物を Nginx のデフォルトのディレクトリにコピー
+# # COPY --from=build /app/build /usr/share/nginx/html
+# COPY --from=build /frontend/out /usr/share/nginx/html
+
+# # Nginx のデフォルトのポートを公開
+# EXPOSE 80
+
+# # Nginx をデフォルトのコマンドとして実行
+# CMD ["nginx", "-g", "daemon off;"]
