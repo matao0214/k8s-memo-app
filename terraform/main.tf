@@ -13,7 +13,7 @@ resource "google_compute_subnetwork" "default" {
   ip_cidr_range = "10.0.0.0/16"
   region        = data.google_client_config.default.region
 
-  stack_type       = "IPV4_IPV6"
+  stack_type = "IPV4_IPV6"
   # ipv6_access_type = "INTERNAL" # Change to "EXTERNAL" if creating an external loadbalancer
   ipv6_access_type = "EXTERNAL"
 
@@ -58,7 +58,7 @@ resource "google_artifact_registry_repository" "default" {
     id     = "delete-old-image"
     action = "KEEP"
     most_recent_versions {
-      keep_count             = 1
+      keep_count            = 1
       package_name_prefixes = []
     }
   }
