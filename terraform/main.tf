@@ -66,3 +66,19 @@ resource "google_artifact_registry_repository" "default" {
     immutable_tags = false
   }
 }
+
+resource "google_sql_database_instance" "example-cloudsql-instance" {
+  database_version    = "POSTGRES_16"
+  region              = data.google_client_config.default.region
+  name                = "example-cloudsql-instance"
+  project             = data.google_client_config.default.project
+  deletion_protection = false
+  settings {
+    edition         = "ENTERPRISE"
+    tier            = "db-f1-micro"
+    pricing_plan    = "PER_USE"
+    disk_size       = 10
+    disk_type       = "PD_HDD"
+    disk_autoresize = false
+  }
+}
