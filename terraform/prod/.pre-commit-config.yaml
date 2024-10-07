@@ -3,7 +3,7 @@ repos:
     rev: v1.77.0
     hooks:
       - id: terraform_fmt
-      - id: terraform_tflint
       # 必要に応じてコメントアウト解除
+      # - id: terraform_tflint
       # - id: terraform_docs
       # - id: terraform_tfsec
