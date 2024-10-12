@@ -5,8 +5,10 @@ steps:
            '-t', 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:latest', 
            '-f', 'Dockerfile.prod',
            '.']
-
   # Docker Push
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 
            'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:latest']
+
+options:
+  logging: CLOUD_LOGGING_ONLY
