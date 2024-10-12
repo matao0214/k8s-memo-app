@@ -4,7 +4,11 @@ class TodosController < ApplicationController
   # GET /todos
   def index
     @todos = Todo.all.order(created_at: :desc)
-    render json: @todos
+    if @todos.empty?
+      render json: { message: 'No todos found' }, status: :not_found
+    else
+      render json: @todos
+    end
   end
 
   # POST /todos

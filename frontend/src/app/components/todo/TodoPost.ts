@@ -1,6 +1,8 @@
 export default async function TodoPost(title:string) {
-  const response = await fetch('http://localhost:3000/todos', {
-	method: 'POST',
+	const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+  const response = await fetch(`${apiUrl}/todos`, {
+			method: 'POST',
 	headers: {
 	  'Content-Type': 'application/json',
 	},

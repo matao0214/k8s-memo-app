@@ -1,0 +1,22 @@
+FROM ruby:3.2.2
+
+ENV RAILS_ENV=production
+ENV NODE_ENV=production
+
+RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
+
+WORKDIR /api
+
+# Gemfileのコピーとインストール
+COPY Gemfile Gemfile.lock /api/
+RUN bundle install
+
+COPY . /api/
+
+# ローカルでビルドするとdevelopment.logが残ってしまうためlog配下のファイルを削除
+RUN rm -rf log/*
+
+RUN mkdir -p tmp/sockets tmp/pids tmp/cache log
+
+# アプリケーションの実行コマンドを指定
+CMD ["rails", "server", "-e", "production", "-b", "0.0.0.0"]

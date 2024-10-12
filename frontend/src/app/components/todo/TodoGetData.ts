@@ -1,5 +1,7 @@
 export default async function getData() {
-  const response = await fetch('http://localhost:3000/todos');
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+  const response = await fetch(`${apiUrl}/todos`);
   if (!response.ok) {
     throw new Error('Failed to fetch data');
   }
