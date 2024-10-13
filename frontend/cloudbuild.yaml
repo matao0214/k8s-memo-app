@@ -14,7 +14,9 @@ steps:
     args: ['container', 'clusters', 'get-credentials', 'example-autopilot-cluster', '--region', 'asia-northeast1', '--project', '${PROJECT_ID}']
   # Deploy to GKE
   - name: 'gcr.io/cloud-builders/kubectl'
+    env:
+      - "CLOUDSDK_COMPUTE_REGION=asia-northeast1"
+      - "CLOUDSDK_CONTAINER_CLUSTER=example-autopilot-cluster"
     args: ['apply', '-f', 'deployment.yaml']
-
 options:
   logging: CLOUD_LOGGING_ONLY
