@@ -9,6 +9,9 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 
            'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:latest']
+  # GKEクラスタの認証情報を取得
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['container', 'clusters', 'get-credentials', 'example-autopilot-cluster', '--zone', 'asia-northeast1-b', '--project', '${PROJECT_ID}']
   # Deploy to GKE
   - name: 'gcr.io/cloud-builders/kubectl'
     args: ['apply', '-f', 'deployment.yaml']
