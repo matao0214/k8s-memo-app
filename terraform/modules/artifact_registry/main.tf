@@ -5,11 +5,17 @@ resource "google_artifact_registry_repository" "default" {
   location      = data.google_client_config.default.region
   format        = "DOCKER"
   cleanup_policies {
-    id     = "delete-old-image"
+    id     = "delete-any"
+    action = "DELETE"
+    condition {
+      tag_state = "ANY"
+    }
+  }
+  cleanup_policies {
+    id     = "keep-latest"
     action = "KEEP"
     most_recent_versions {
-      keep_count            = 1
-      package_name_prefixes = []
+      keep_count = 1
     }
   }
   docker_config {
