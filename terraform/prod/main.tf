@@ -25,3 +25,13 @@ module "sql" {
   db_settings_disk_type       = "PD_HDD"
   db_settings_disk_autoresize = false
 }
+
+module "service_account" {
+  source = "../modules/service_account"
+}
+
+module "cloud_build" {
+  source          = "../modules/cloud_build"
+  project_id      = var.project_id
+  service_account = module.service_account.cloud_build_id
+}

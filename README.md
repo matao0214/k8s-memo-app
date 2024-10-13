@@ -77,3 +77,5 @@ https://dev.classmethod.jp/articles/pre-commit-terraform-introduction/
 brew install pre-commit
 pre-commit install
 
+### CI
+setting is manual now. It will be automation with terraform.
