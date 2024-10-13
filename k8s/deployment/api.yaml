@@ -11,6 +11,9 @@ spec:
     metadata:
       labels:
         app: api
+      # デプロイの度に値が更新されpodが作り直されるようにする
+      annotations:
+        redeployTimestamp: "$(date)"
     spec:
       serviceAccountName: cloud-sql-proxy
       containers:
