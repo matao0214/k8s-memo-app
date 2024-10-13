@@ -17,6 +17,6 @@ steps:
     env:
       - "CLOUDSDK_COMPUTE_REGION=asia-northeast1"
       - "CLOUDSDK_CONTAINER_CLUSTER=example-autopilot-cluster"
-    args: ['apply', '-f', 'k8s/deployment.yaml']
+    args: ['apply', '-f', 'k8s/deployment/frontend.yaml']
 options:
   logging: CLOUD_LOGGING_ONLY
