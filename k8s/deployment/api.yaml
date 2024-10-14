@@ -80,7 +80,7 @@ spec:
 
           # Replace DB_PORT with the port the proxy should listen on
           - "--port=5432"
-          - "${DB_CONNECTION_NAME}"
+          - "--instance=${DB_CONNECTION_NAME}"
         securityContext:
           # The default Cloud SQL Auth Proxy image runs as the
           # "nonroot" user and group (uid: 65532) by default.
