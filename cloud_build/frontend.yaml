@@ -5,19 +5,24 @@ steps:
            '-t', 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:latest', 
            '-f', 'frontend/Dockerfile.prod',
            'frontend']
+
   # Docker Push
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 
            'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:latest']
+
   # GKEクラスタの認証情報を取得
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['container', 'clusters', 'get-credentials', '${_CLOUDSDK_CONTAINER_CLUSTER}', '--region', '${_CLOUDSDK_COMPUTE_REGION}', '--project', '${PROJECT_ID}']
+
   # Deploy to GKE
   - name: 'gcr.io/cloud-builders/kubectl'
     args: ['apply', '-f', 'k8s/deployment/frontend.yaml']
+
 substitutions:
   _CLOUDSDK_COMPUTE_REGION: asia-northeast1
   _CLOUDSDK_CONTAINER_CLUSTER: example-autopilot-cluster
+
 options:
   logging: CLOUD_LOGGING_ONLY
   env:
