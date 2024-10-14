@@ -3,11 +3,6 @@ output "db_user_password" {
   sensitive = true
 }
 
-output "db_instance_name" {
-  value     = google_sql_database_instance.example-cloudsql-instance.name
-  sensitive = true
-}
-
 output "db_uesr_name" {
   value     = google_sql_user.default.name
   sensitive = true

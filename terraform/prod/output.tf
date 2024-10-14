@@ -1,10 +1,15 @@
+output "db_user_name" {
+  value     = module.sql.db_uesr_name
+  sensitive = true
+}
+
 output "db_user_password" {
   value     = module.sql.db_user_password
   sensitive = true
 }
 
-output "db_instance_name" {
-  value     = module.sql.db_instance_name
+output "db_name" {
+  value     = "memo-app-${module.sql.four_bytes}"
   sensitive = true
 }
 

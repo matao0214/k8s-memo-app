@@ -11,12 +11,12 @@ steps:
            'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:latest']
   # GKEクラスタの認証情報を取得
   - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['container', 'clusters', 'get-credentials', 'example-autopilot-cluster', '--region', 'asia-northeast1', '--project', '${PROJECT_ID}']
+    args: ['container', 'clusters', 'get-credentials', '${CLOUDSDK_CONTAINER_CLUSTER}', '--region', 'asia-northeast1', '--project', '${PROJECT_ID}']
   # Deploy to GKE
   - name: 'gcr.io/cloud-builders/kubectl'
-    env:
-      - "CLOUDSDK_COMPUTE_REGION=asia-northeast1"
-      - "CLOUDSDK_CONTAINER_CLUSTER=example-autopilot-cluster"
     args: ['apply', '-f', 'k8s/deployment/frontend.yaml']
 options:
   logging: CLOUD_LOGGING_ONLY
+  env:
+    - "CLOUDSDK_COMPUTE_REGION=asia-northeast1"
+    - "CLOUDSDK_CONTAINER_CLUSTER=example-autopilot-cluster"
