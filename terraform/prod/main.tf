@@ -16,7 +16,7 @@ module "artifact_registry_repository" {
 
 module "sql" {
   source                      = "../modules/sql"
-  db_name                     = "example-cloudsql-instance"
+  db_instance_name            = "memo-app-instance-${module.sql.four_bytes}"
   db_deletion_protection      = false
   db_settings_edition         = "ENTERPRISE"
   db_settings_tier            = "db-f1-micro"

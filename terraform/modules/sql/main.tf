@@ -1,9 +1,13 @@
 data "google_client_config" "default" {}
 
+resource "random_id" "four_bytes" {
+  byte_length = 4
+}
+
 resource "google_sql_database_instance" "example-cloudsql-instance" {
   database_version    = "POSTGRES_16"
   region              = data.google_client_config.default.region
-  name                = var.db_name
+  name                = var.db_instance_name
   project             = data.google_client_config.default.project
   deletion_protection = var.db_deletion_protection
   settings {
@@ -14,4 +18,19 @@ resource "google_sql_database_instance" "example-cloudsql-instance" {
     disk_type       = var.db_settings_disk_type
     disk_autoresize = var.db_settings_disk_autoresize
   }
+}
+
+resource "random_password" "db_user" {
+  length  = 16
+  special = true
+}
+
+resource "random_id" "db_user" {
+  byte_length = 4
+}
+
+resource "google_sql_user" "default" {
+  name     = "postgres_user_${random_id.db_user.hex}"
+  instance = google_sql_database_instance.example-cloudsql-instance.name
+  password = random_password.db_user.result
 }

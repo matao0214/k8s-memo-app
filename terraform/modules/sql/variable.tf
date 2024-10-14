@@ -1,4 +1,4 @@
-variable "db_name" {
+variable "db_instance_name" {
   type = string
 }
 
