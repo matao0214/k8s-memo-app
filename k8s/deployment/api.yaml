@@ -65,11 +65,11 @@ spec:
         # Make sure to update on a regular schedule!
         image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.11.4
         env:
-          - name: DB_CONNECTION_NAME
+          - name: INSTANCE_CONNECTION_NAME
             valueFrom:
               secretKeyRef:
                 name: api-secret
-                key: DB_CONNECTION_NAME
+                key: INSTANCE_CONNECTION_NAME
         args:
           # If connecting from a VPC-native GKE cluster, you can use the
           # following flag to have the proxy connect over private IP
@@ -77,10 +77,8 @@ spec:
 
           # Enable structured logging with LogEntry format:
           - "--structured-logs"
-
           # Replace DB_PORT with the port the proxy should listen on
           - "--port=5432"
-          - "--instance=${DB_CONNECTION_NAME}"
         securityContext:
           # The default Cloud SQL Auth Proxy image runs as the
           # "nonroot" user and group (uid: 65532) by default.
