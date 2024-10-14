@@ -25,7 +25,7 @@ gcloud container clusters get-credentials example-autopilot-cluster --region asi
 cd api/
 
 ### Create secret
-kubectl create secret generic --save-config postgres-secret --from-env-file ./config/secret/prod.env
+kubectl create secret generic --save-config api-secret --from-env-file ./config/secret/prod.env
 ### Push imaga to Artifact Registry
 docker build -t memo-app-api-prod:latest -f Dockerfile.prod .      
 docker tag memo-app-api-prod:latest asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-api:latest

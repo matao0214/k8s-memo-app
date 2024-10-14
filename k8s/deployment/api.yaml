@@ -26,23 +26,28 @@ spec:
         - name: POSTGRES_DB
           valueFrom:
             secretKeyRef:
-              name: postgres-secret
+              name: api-secret
               key: POSTGRES_DB
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: postgres-secret
+              name: api-secret
               key: POSTGRES_USER
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: postgres-secret
+              name: api-secret
               key: POSTGRES_PASSWORD
         - name: POSTGRES_HOST
           valueFrom:
             secretKeyRef:
-              name: postgres-secret
+              name: api-secret
               key: POSTGRES_HOST
+        - name: SECRET_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              name: api-secret
+              key: SECRET_KEY_BASE
         # フロントエンドのURLを指定。port=80の場合はportの記載省力する。
         - name: CORS_ALLOWED_ORIGINS
           value: "http://34.84.160.2"
