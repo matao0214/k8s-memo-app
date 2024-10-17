@@ -8,7 +8,6 @@ spec:
     metadata:
       labels:
         app: frontend
-      # デプロイの度に値が更新されpodが作り直されるようにする
       annotations:
         redeployTimestamp: "$(date)"
     spec:

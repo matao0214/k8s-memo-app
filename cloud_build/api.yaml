@@ -15,6 +15,15 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['container', 'clusters', 'get-credentials', '${_CLOUDSDK_CONTAINER_CLUSTER}', '--region', '${_CLOUDSDK_COMPUTE_REGION}', '--project', '${PROJECT_ID}']
 
+  # Step to update the deployment YAML with current timestamp
+  # 動的に値を変えてpodが生成されるようにする
+  - name: 'alpine'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        sed -i "s/redeployTimestamp: \".*\"/redeployTimestamp: \"$(date +'%Y-%m-%dT%H:%M:%S')\"/" k8s/deployment/api.yaml
+
   # Deploy to GKE
   - name: 'gcr.io/cloud-builders/kubectl'
     args: ['apply', '-f', 'k8s/deployment/api.yaml']
