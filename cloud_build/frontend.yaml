@@ -37,7 +37,7 @@ steps:
     args:
       - '-c'
       - |
-        sed -i "s/redeployTimestamp: \".*\"/redeployTimestamp: \"$(date +'%Y-%m-%dT%H:%M:%S')\"/" k8s/deployment/frontend.yaml'
+        sed -i "s/redeployTimestamp: \".*\"/redeployTimestamp: \"$(date +'%Y-%m-%dT%H:%M:%S')\"/" k8s/deploy.yaml
 
   # Deploy to GKE
   - name: 'gcr.io/cloud-builders/kubectl'
