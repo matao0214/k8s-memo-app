@@ -12,6 +12,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build',
            '-t', 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:latest', 
+           '--build-arg', 'NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}',
            '-f', 'frontend/Dockerfile.prod',
            'frontend']
 
@@ -37,4 +38,4 @@ options:
   env:
     - "CLOUDSDK_COMPUTE_REGION=${_CLOUDSDK_COMPUTE_REGION}"
     - "CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}"
-    - "NEXT_PUBLIC_API_URL=$(grep NEXT_PUBLIC_API_URL $$HOME/.env | cut -d '=' -f2)"  # 環境変数を直接設定
+    - "NEXT_PUBLIC_API_URL=$(grep NEXT_PUBLIC_API_URL $$HOME/.env | cut -d '=' -f2)"
