@@ -3,7 +3,7 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['container', 'clusters', 'get-credentials', '${_CLOUDSDK_CONTAINER_CLUSTER}', '--region', '${_CLOUDSDK_COMPUTE_REGION}', '--project', '${PROJECT_ID}']
 
-  # サービスの外部IPを取得し、環境変数に設定
+  # サービスの外部IPを取得
   - name: 'gcr.io/cloud-builders/kubectl'
     entrypoint: 'sh'
     args:
@@ -12,12 +12,14 @@ steps:
         API_URL=$$(kubectl get service api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
         echo "API_URL: $$API_URL"
         echo "http://$$API_URL:3000" > /workspace/api-url.txt
+        echo "/workspace/api-url.txt: (cat /workspace/api-url.txt)"
+
 
   # Docker Build
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build',
            '-t', 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:latest', 
-           '--build-arg', 'NEXT_PUBLIC_API_URL=$$(cat /workspace/api-url.txt)',
+           '--build-arg', 'NEXT_PUBLIC_API_URL=$(cat /workspace/api-url.txt)',
            '-f', 'frontend/Dockerfile.prod',
            'frontend']
 
