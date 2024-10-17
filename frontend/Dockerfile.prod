@@ -7,7 +7,7 @@ COPY . .
 
 # API_URL を環境変数に設定
 # k8s/deployment/frontend.yaml で設定しても反映されないためここで設定
-ENV NEXT_PUBLIC_API_URL=http://35.221.111.23:3000
+# ENV NEXT_PUBLIC_API_URL=http://35.221.111.23:3000
 
 RUN npm install
 RUN npm run build

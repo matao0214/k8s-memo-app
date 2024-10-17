@@ -6,7 +6,7 @@ steps:
       - '-c'
       - |
         API_URL=$(kubectl get service api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-        echo "NEXT_PUBLIC_API_URL=http://$$API_URL" >> $$HOME/.env
+        echo "NEXT_PUBLIC_API_URL=http://$$API_URL:3000" >> $$HOME/.env
 
   # Docker Build
   - name: 'gcr.io/cloud-builders/docker'
