@@ -1,4 +1,8 @@
 steps:
+  # GKEクラスタの認証情報を取得
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['container', 'clusters', 'get-credentials', '${_CLOUDSDK_CONTAINER_CLUSTER}', '--region', '${_CLOUDSDK_COMPUTE_REGION}', '--project', '${PROJECT_ID}']
+
   # サービスの外部IPを取得し、環境変数に設定
   - name: 'gcr.io/cloud-builders/kubectl'
     entrypoint: 'sh'
@@ -21,10 +25,6 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 
            'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:latest']
-
-  # GKEクラスタの認証情報を取得
-  - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['container', 'clusters', 'get-credentials', '${_CLOUDSDK_CONTAINER_CLUSTER}', '--region', '${_CLOUDSDK_COMPUTE_REGION}', '--project', '${PROJECT_ID}']
 
   # Deploy to GKE
   - name: 'gcr.io/cloud-builders/kubectl'
