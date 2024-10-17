@@ -8,7 +8,10 @@ COPY . .
 # API_URL を環境変数に設定
 # k8s/deployment/frontend.yaml で設定しても反映されないためここで設定
 # CloudBuild でビルドする際にNEXT_PUBLIC_API_URLを渡す
+ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
+RUN echo "NEXT_PUBLIC_API_URL is ${NEXT_PUBLIC_API_URL}"
 
 RUN npm install
 RUN npm run build
