@@ -1,4 +1,13 @@
 steps:
+  # サービスの外部IPを取得し、環境変数に設定
+  - name: 'gcr.io/cloud-builders/kubectl'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        API_URL=$(kubectl get service api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        echo "NEXT_PUBLIC_API_URL=http://$$API_URL" >> $HOME/.env
+
   # Docker Build
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build',
@@ -28,3 +37,4 @@ options:
   env:
     - "CLOUDSDK_COMPUTE_REGION=${_CLOUDSDK_COMPUTE_REGION}"
     - "CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}"
+    - "NEXT_PUBLIC_API_URL=$(grep NEXT_PUBLIC_API_URL $HOME/.env | cut -d '=' -f2)"  # 環境変数を直接設定
