@@ -9,16 +9,16 @@ steps:
     args:
       - '-c'
       - |
-        API_URL=$$(kubectl get service api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-        echo "API_URL: $$API_URL"
-        echo "http://$$API_URL:3000" > /workspace/api-url.txt
+        API_URL=$(kubectl get service api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        echo "API_URL: $API_URL"
+        echo "http://$API_URL:3000" > /workspace/api-url.txt
         echo "CAT_API_URL: $(cat /workspace/api-url.txt)"
 
   # Docker Build
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build',
            '-t', 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:latest', 
-           '--build-arg', 'NEXT_PUBLIC_API_URL=$(cat /workspace/api-url.txt)',
+           '--build-arg', 'NEXT_PUBLIC_API_URL=$$(cat /workspace/api-url.txt)',
            '-f', 'frontend/Dockerfile.prod',
            'frontend']
 
