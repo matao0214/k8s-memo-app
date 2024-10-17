@@ -15,12 +15,16 @@ steps:
 
   # Docker Build
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build',
-           '-t', 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:latest', 
-           '--build-arg', 'NEXT_PUBLIC_API_URL=$(cat /workspace/api-url.txt)',
-           '-f', 'frontend/Dockerfile.prod',
-           'frontend']
-
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        NEXT_PUBLIC_API_URL=$$(cat /workspace/api-url.txt)
+        docker build \
+          -t asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:latest \
+          --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+          -f frontend/Dockerfile.prod \
+          frontend
   # Docker Push
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 
