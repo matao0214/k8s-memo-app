@@ -6,14 +6,13 @@ steps:
            '-f', 'api/Dockerfile.prod',
            'api']
 
-  # Rubocop
-  - name: 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-api:latest'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        bundle install
-        bundle exec rubocop
+  # Rubocop Check
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'run', '--rm',
+      'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-api:latest',
+      'sh', '-c', 'bundle install && bundle exec rubocop'
+    ]
 
   # Docker Push
   - name: 'gcr.io/cloud-builders/docker'
