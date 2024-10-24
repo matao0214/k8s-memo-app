@@ -9,7 +9,7 @@ output "db_user_password" {
 }
 
 output "db_name" {
-  value     = "memo-app-${module.sql.four_bytes}"
+  value     = module.sql.db_name
   sensitive = true
 }
 

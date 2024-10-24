@@ -2,14 +2,38 @@
 cd docker/
 docker compose up -d
 
-# Reference
-フロントエンド、バックエンドは以下を参考に作成
+Access: http://localhost:3001/
+
+# Auto deploy for GKE
+## Initialize
+### Create gihub access token
+https://github.com/settings/tokens
+Create Token by "Token(classic)", not beta.
+Paste the access token into terraform/modules/cloud_build/my-github-token.txt
+
+### Check github install ID
+https://github.com/apps/google-cloud-build/installations/select_target
+Paste the number at the end of the linked URL into terraform/modules/cloud_build/my-github-app-installation-id.txt
+
+### Check repo URL
+Paste the repo URL into terraform/modules/cloud_build/my-github-repo-url.txt
+ex) https://github.com/matao0214/memo-app.git
+
+## Setup and deploy for GKE
+cd ~
+sh ./script/setup.sh
+
+# Application Reference
 https://zenn.dev/jinku/articles/92b76bf09d5351
 
-# Deploy
+# Deploy from local
+Create the infrastructure in advance, including authentication with gke.
+
+gcloud container clusters get-credentials example-autopilot-cluster --region asia-northeast1 --project matao0214-demo
+
 ## Frontend
-cd frontend/
 ### Push imaga to Artifact Registry
+cd frontend/
 docker build -t memo-app-frontend-prod:latest -f Dockerfile.prod .
 docker tag memo-app-frontend-prod asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-frontend:latest
 docker push asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-frontend:latest
@@ -18,15 +42,9 @@ cd k8s/
 kubectl apply -f ./deployment/frontend.yaml
 kubectl apply -f ./service/frontend.yaml
 
-### Connect gke cluster
-gcloud container clusters get-credentials example-autopilot-cluster --region asia-northeast1 --project matao0214-demo
-
 ## Api
-cd api/
-
-### Create secret
-kubectl create secret generic --save-config api-secret --from-env-file ./config/secret/prod.env
 ### Push imaga to Artifact Registry
+cd api/
 docker build -t memo-app-api-prod:latest -f Dockerfile.prod .      
 docker tag memo-app-api-prod:latest asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-api:latest
 docker push asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-api:latest
@@ -36,34 +54,12 @@ kubectl apply -f ./deployment/api.yaml
 kubectl apply -f ./service/api.yaml
 
 ### Migration database
-https://cloud.google.com/sql/docs/mysql/connect-kubernetes-engine?hl=ja#about_connecting_to
-
-gcloud iam service-accounts create cloudsql-connect \
-    --display-name="Cloud SQL Connect Service Account"
-
-gcloud projects add-iam-policy-binding matao0214-demo \
-    --member="serviceAccount:cloudsql-connect@matao0214-demo.iam.gserviceaccount.com" \
-    --role="roles/cloudsql.admin"
-
-kubectl apply -f ./service_account/cloud-sql-proxy.yaml
-
-gcloud iam service-accounts add-iam-policy-binding \
---role="roles/iam.workloadIdentityUser" \
---member="serviceAccount:matao0214-demo.svc.id.goog[default/cloud-sql-proxy]" \
-cloudsql-connect@matao0214-demo.iam.gserviceaccount.com
-
-kubectl annotate serviceaccount \
-cloud-sql-proxy \
-iam.gke.io/gcp-service-account=cloudsql-connect@matao0214-demo.iam.gserviceaccount.com
-
+kubectl get pod
+kubectl exec -it ${pod_name} -- /bin/bash
 rails db:create db:migrate RAILS_ENV=production
 
-## Terraform
-terraform fmt
-terraform plan
-terraform apply
-
-# Vulnerability Check
+# Terraform
+## Vulnerability Check
 cd terraform 
 
 brew install trivy
@@ -72,10 +68,11 @@ trivy config ./main.tf
 brew install checkov
 checkov --file ./main.tf 
 
-# Setting terraform precommit
+## Setting terraform precommit
 https://dev.classmethod.jp/articles/pre-commit-terraform-introduction/
 brew install pre-commit
 pre-commit install
 
-### CI
-setting is manual now. It will be automation with terraform.
+# Clean up
+cd ~
+sh ./script/cleanup.sh

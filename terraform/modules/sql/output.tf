@@ -17,3 +17,8 @@ output "db_connection_name" {
   value     = google_sql_database_instance.example-cloudsql-instance.connection_name
   sensitive = true
 }
+
+output "db_name" {
+  value     = google_sql_database.default.name
+  sensitive = true
+}

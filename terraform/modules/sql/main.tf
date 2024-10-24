@@ -20,6 +20,11 @@ resource "google_sql_database_instance" "example-cloudsql-instance" {
   }
 }
 
+resource "google_sql_database" "default" {
+  name     = "memo-app-${random_id.db_user.hex}"
+  instance = google_sql_database_instance.example-cloudsql-instance.name
+}
+
 resource "random_password" "db_user" {
   length  = 16
   special = true
@@ -33,4 +38,6 @@ resource "google_sql_user" "default" {
   name     = "postgres_user_${random_id.db_user.hex}"
   instance = google_sql_database_instance.example-cloudsql-instance.name
   password = random_password.db_user.result
+
+  depends_on = [google_sql_database_instance.example-cloudsql-instance]
 }

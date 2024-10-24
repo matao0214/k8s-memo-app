@@ -9,6 +9,6 @@ terraform {
 }
 
 provider "google" {
-  project = "matao0214-demo"
+  project = var.project_id
   region  = "asia-northeast1"
 }
