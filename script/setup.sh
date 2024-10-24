@@ -26,4 +26,5 @@ iam.gke.io/gcp-service-account=cloudsql-connect@matao0214-demo.iam.gserviceaccou
 echo "---------- Start kubectl apply deployment ----------"
 gcloud builds triggers run memo-app-api --region=asia-east1 --branch=main
 gcloud builds triggers run memo-app-frontend --region=asia-east1 --branch=main
+echo "---------- Application URL: http://$(kubectl get service frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}') ----------"
 echo "---------- Check build status!!! ----------"

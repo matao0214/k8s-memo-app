@@ -46,4 +46,3 @@ echo "---------- If empty item, rerun this scrpt. ----------"
 cat api/config/secret/prod.env
 
 echo "---------- Finish create secret shell script ----------"
-echo "---------- Application URL: http://$(kubectl get service frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}') ----------"
