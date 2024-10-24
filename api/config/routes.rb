@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
-  resources :todos, only: [:index, :create, :update, :destroy]
+  resources :todos, only: %i[index create update destroy]
 end
