@@ -1,4 +1,6 @@
 # System architecture
+Simple memo application on GKE.
+
 ```mermaid
 graph LR;
     A((Client)) ---> |Through Service|B["Frontend pod(Nextjs)"];
@@ -14,10 +16,16 @@ graph LR;
     F(GitHub) --> E
     H((Developer)) --> F
 ```
-This application the setup of a Next.js frontend and a Ruby on Rails API running on GKE Autopilot.  
 
-It includes a Cloud SQL database, a Cloud Build CI/CD pipeline, and integration with GitHub.   
-The entire environment can be provisioned and deployed with a single command.
+**Technology Stack**
+- **Platform**: GCP (Managed by Terraform)
+- **Container Orchestration**: GKE Autopilot
+- **Frontend**: Next.js  
+- **API**: Ruby on Rails  
+- **Database**: Cloud SQL (PostgreSQL)  
+- **CI/CD**: Cloud Build
+
+
 # Build system on GCP
 ## Initialize
 Create setting files for github.
