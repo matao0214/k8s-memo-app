@@ -3,7 +3,7 @@ import TodoList from './components/todo/TodoList';
 function Page() {
   return (
     <div>
-      <h1>Memo app on GKE autopilot</h1>
+      <h1>Memo app on kubernetes</h1>
       <TodoList />
     </div>
   );
