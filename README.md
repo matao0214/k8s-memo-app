@@ -154,7 +154,7 @@ touch terraform/modules/cloud_build/my-github-app-installation-id.txt
 touch terraform/modules/cloud_build/my-github-repo-url.txt
 ```
 
-### 2.Gihub access token の作成
+### 2.Github access token の作成
 1. URL: [GitHub Tokens](https://github.com/settings/tokens).
 1. `Token (classic)`からtokenを作成
 1. tokenを貼り付け ***terraform/modules/cloud_build/my-github-token.txt***
