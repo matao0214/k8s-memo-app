@@ -21,17 +21,25 @@ steps:
       - |
         NEXT_PUBLIC_API_URL=$$(cat /workspace/api-url.txt)
         docker build \
-          -t asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:latest \
+          -t asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:${SHORT_SHA} \
           --build-arg NEXT_PUBLIC_API_URL=$$NEXT_PUBLIC_API_URL \
           -f frontend/Dockerfile.prod \
           frontend
+
   # Docker Push
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 
-           'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:latest']
+           'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:${SHORT_SHA}']
 
-  # Step to update the deployment YAML with current timestamp
-  # 動的に値を変えてpodが生成されるようにする
+  # deployment.yaml の imageタグを書き換え
+  - name: 'alpine'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        sed -i "s|image: asia-northeast1-docker.pkg.dev/.*/memo-app-frontend:.*|image: asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-frontend:${SHORT_SHA}|" k8s/deployment/frontend.yaml
+
+  # redeployTimestamp も更新
   - name: 'alpine'
     entrypoint: 'sh'
     args:
@@ -39,9 +47,21 @@ steps:
       - |
         sed -i "s/redeployTimestamp: \".*\"/redeployTimestamp: \"$(date +'%Y-%m-%dT%H:%M:%S')\"/" k8s/deployment/frontend.yaml
 
-  # Deploy to GKE
-  - name: 'gcr.io/cloud-builders/kubectl'
-    args: ['apply', '-f', 'k8s/deployment/frontend.yaml']
+  # Git commit & push
+  - name: 'gcr.io/cloud-builders/git'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        git config --global user.email "cloudbuild@example.com"
+        git config --global user.name "cloudbuild"
+        git add k8s/deployment/frontend.yaml
+        git commit -m "Update frontend image tag to ${SHORT_SHA} [ci skip]"
+        git push origin main
+
+  # # Deploy to GKE
+  # - name: 'gcr.io/cloud-builders/kubectl'
+  #   args: ['apply', '-f', 'k8s/deployment/frontend.yaml']
 
 substitutions:
   _CLOUDSDK_COMPUTE_REGION: asia-northeast1
