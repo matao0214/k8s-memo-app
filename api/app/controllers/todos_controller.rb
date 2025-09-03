@@ -5,7 +5,7 @@ class TodosController < ApplicationController
 
   # GET /todos
   def index
-    @todos = Todo.all.order(created_at: :desc)
+    @todos = Todo.all
     if @todos.empty?
       render json: { message: 'No todos found' }, status: :not_found
     else
