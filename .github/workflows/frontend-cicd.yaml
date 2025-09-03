@@ -8,7 +8,7 @@ on:
       - 'frontend/**'
 
 env:
-  PROJECT_ID: matao0214-demo # TODO: 環境変数に変更
+  PROJECT_ID: matao0214-demo
   CLUSTER_NAME: example-autopilot-cluster
   CLUSTER_REGION: asia-northeast1
   IMAGE_REPO: asia-northeast1-docker.pkg.dev/${{ env.PROJECT_ID }}/docker/memo-app-frontend
