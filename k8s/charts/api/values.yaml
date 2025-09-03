@@ -1,0 +1,18 @@
+api:
+  replicaCount: 1
+  image:
+    repository: asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-api
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  serviceAccount:
+    name: cloud-sql-proxy
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "1Gi"
+    limits:
+      cpu: "500m"
+      memory: "2Gi"

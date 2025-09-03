@@ -1,0 +1,23 @@
+environments:
+  local:
+    values:
+      - environments/local.yaml
+  dev:
+    values:
+      - environments/dev.yaml
+---
+releases:
+  - name: api
+    chart: ./charts/api
+    values:
+      - ./charts/api/values.yaml
+      - environments/{{ .Environment.Name }}.yaml
+  - name: frontend
+    chart: ./charts/frontend
+    values:
+      - ./charts/frontend/values.yaml
+      - environments/{{ .Environment.Name }}.yaml
+  # 必要に応じて外部チャートも追加
+  # - name: ingress
+  #   namespace: ingress
+  #   chart: stable/nginx-ingress

@@ -1,0 +1,5 @@
+api:
+  replicaCount: 1
+
+frontend:
+  replicaCount: 1

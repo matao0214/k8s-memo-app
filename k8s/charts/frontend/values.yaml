@@ -1,0 +1,16 @@
+frontend:
+  replicaCount: 1
+  image:
+    repository: asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: LoadBalancer
+    port: 80
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "200m"
+      memory: "512Mi"
