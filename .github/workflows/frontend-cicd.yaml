@@ -1,4 +1,4 @@
-name: Deploy Frontend to GKE
+name: "[Frontend] Build image and update image tag"
 
 on:
   push:
