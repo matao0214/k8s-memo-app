@@ -58,10 +58,8 @@ steps:
         git checkout main 2>/dev/null || git checkout -b main
         git add k8s/deployment/frontend.yaml
         git commit -m "Update frontend image tag to ${SHORT_SHA} [ci skip]" || echo "No changes to commit"
-        git remote set-url origin https://$GITHUB_USER:$GITHUB_TOKEN@github.com/matao0214/k8s-memo-app.git
+        git remote set-url origin https://$_GITHUB_USER:$GITHUB_TOKEN@github.com/matao0214/k8s-memo-app.git
         git push origin main
-    env:
-      - 'GITHUB_USER=matao0214'
     secretEnv:
       - 'GITHUB_TOKEN'
 
@@ -77,6 +75,7 @@ availableSecrets:
 substitutions:
   _CLOUDSDK_COMPUTE_REGION: asia-northeast1
   _CLOUDSDK_CONTAINER_CLUSTER: example-autopilot-cluster
+  _GITHUB_USER: 'matao0214'
 
 options:
   logging: CLOUD_LOGGING_ONLY
