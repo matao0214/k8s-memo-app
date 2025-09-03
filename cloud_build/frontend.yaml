@@ -62,12 +62,13 @@ steps:
         git push origin main
     env:
       - 'GITHUB_USER=matao0214'
-    secretEnv: GITHUB_TOKEN
+    secretEnv:
+      - 'GITHUB_TOKEN'
 
 availableSecrets:
   secretManager:
-  - versionName: projects/47868622352/secrets/github-token-secret/versions/1
-    env: GITHUB_TOKEN
+    - versionName: projects/47868622352/secrets/github-token-secret/versions/1
+      env: 'GITHUB_TOKEN'
 
   # # Deploy to GKE
   # - name: 'gcr.io/cloud-builders/kubectl'
