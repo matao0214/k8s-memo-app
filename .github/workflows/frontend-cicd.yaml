@@ -1,0 +1,66 @@
+name: Deploy Frontend to GKE
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+
+env:
+  PROJECT_ID: matao0214-demo # TODO: 環境変数に変更
+  CLUSTER_NAME: example-autopilot-cluster
+  CLUSTER_REGION: asia-northeast1
+  IMAGE_REPO: asia-northeast1-docker.pkg.dev/${{ env.PROJECT_ID }}/docker/memo-app-frontend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. GitHubからコードチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. GCP 認証
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # 3. gcloud CLI セットアップ
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          export_default_credentials: true
+
+      # 4. GKE クラスタ認証
+      - name: Get GKE credentials
+        run: |
+          gcloud container clusters get-credentials $CLUSTER_NAME \
+            --region $CLUSTER_REGION \
+            --project $PROJECT_ID
+
+      # 5. Docker Build & Push
+      - name: Build & Push Frontend Image
+        run: |
+          docker build \
+            -t $IMAGE_REPO:${GITHUB_SHA::7} \
+            --build-arg NEXT_PUBLIC_API_URL=${{ env.API_URL }} \
+            -f frontend/Dockerfile.prod frontend
+          docker push $IMAGE_REPO:${GITHUB_SHA::7}
+
+      # 6. deployment.yaml の image タグ書き換え
+      - name: Update deployment.yaml
+        run: |
+          sed -i "s|image: .*/memo-app-frontend:.*|image: $IMAGE_REPO:${GITHUB_SHA::7}|" k8s/deployment/frontend.yaml
+          sed -i "s/redeployTimestamp: \".*\"/redeployTimestamp: \"$(date +'%Y-%m-%dT%H:%M:%S')\"/" k8s/deployment/frontend.yaml
+
+      # 7. Git commit & push
+      - name: Commit updated deployment
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add k8s/deployment/frontend.yaml
+          git commit -m "Update frontend image tag to ${GITHUB_SHA::7} [ci skip]" || echo "No changes to commit"
+          git push origin main
