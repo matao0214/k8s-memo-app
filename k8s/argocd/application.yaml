@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: memo-app-deployment
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/matao0214/k8s-memo-app.git
+    targetRevision: main
+    path: k8s/deployment
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true
