@@ -2,6 +2,8 @@
 
 set -x  # Display executed commands
 
+helmfile destroy -f k8s/helmfile.yaml
+
 cd terraform/prod
 
 # 一回ではDB関連のリソースが削除できないため2回実行

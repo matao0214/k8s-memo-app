@@ -11,7 +11,7 @@ resource "google_cloudbuild_trigger" "memo-app" {
   # memo-app-${変数}の形式でトリガー名を設定
   name           = "memo-app-${each.key}"
   filename       = "cloud_build/${each.key}.yaml"
-  included_files = ["${each.key}/**", "cloud_build/${each.key}.yaml", "k8s/deployment/${each.key}.yaml"]
+  included_files = ["${each.key}/**", "cloud_build/${each.key}.yaml"]
 
   # asia-notheast1だと制限がありビルドできなかったので、asia-east1に変更
   # https://cloud.google.com/build/docs/locations?hl=ja#restricted_regions_for_some_projects

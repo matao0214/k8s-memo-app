@@ -2,7 +2,7 @@ steps:
   # Docker Build
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build',
-           '-t', 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-api:latest', 
+           '-t', 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-api:${SHORT_SHA}', 
            '-f', 'api/Dockerfile.prod',
            'api']
 
@@ -10,31 +10,42 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'run', '--rm',
-      'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-api:latest',
+      'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-api:${SHORT_SHA}',
       'sh', '-c', 'bundle install && bundle exec rubocop'
     ]
 
   # Docker Push
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 
-           'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-api:latest']
+           'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-api:${SHORT_SHA}']
 
-  # GKEクラスタの認証情報を取得
-  - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['container', 'clusters', 'get-credentials', '${_CLOUDSDK_CONTAINER_CLUSTER}', '--region', '${_CLOUDSDK_COMPUTE_REGION}', '--project', '${PROJECT_ID}']
-
-  # Step to update the deployment YAML with current timestamp
-  # 動的に値を変えてpodが生成されるようにする
+  # Update image tag
   - name: 'alpine'
     entrypoint: 'sh'
     args:
       - '-c'
       - |
-        sed -i "s/redeployTimestamp: \".*\"/redeployTimestamp: \"$(date +'%Y-%m-%dT%H:%M:%S')\"/" k8s/deployment/api.yaml
+        sed -i "s|image: asia-northeast1-docker.pkg.dev/.*/memo-app-api:.*|image: asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-api:${SHORT_SHA}|" k8s/deployment/api.yaml
 
-  # Deploy to GKE
-  - name: 'gcr.io/cloud-builders/kubectl'
-    args: ['apply', '-f', 'k8s/deployment/api.yaml']
+  # Git commit & push
+  - name: 'gcr.io/cloud-builders/git'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        git config --global user.email "cloudbuild@example.com"
+        git config --global user.name "cloudbuild"
+        git checkout main 2>/dev/null || git checkout -b main
+        git add k8s/deployment/api.yaml
+        git commit -m "Update api image tag to ${SHORT_SHA} [ci skip]" || echo "No changes to commit"
+        git remote set-url origin https://$_GITHUB_USER:$$GITHUB_TOKEN@github.com/matao0214/k8s-memo-app.git
+        git push origin main
+    secretEnv:
+      - 'GITHUB_TOKEN'
+
+  # GKEクラスタの認証情報を取得
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['container', 'clusters', 'get-credentials', '${_CLOUDSDK_CONTAINER_CLUSTER}', '--region', '${_CLOUDSDK_COMPUTE_REGION}', '--project', '${PROJECT_ID}']
 
   # DB Create & Migrate
   - name: 'gcr.io/cloud-builders/kubectl'
@@ -50,9 +61,15 @@ steps:
         done
         kubectl exec -it $$POD_NAME -- rails db:create db:migrate RAILS_ENV=production
 
+availableSecrets:
+  secretManager:
+    - versionName: projects/${PROJECT_NUMBER}/secrets/github-token-secret/versions/1
+      env: 'GITHUB_TOKEN'
+
 substitutions:
   _CLOUDSDK_COMPUTE_REGION: asia-northeast1
   _CLOUDSDK_CONTAINER_CLUSTER: example-autopilot-cluster
+  _GITHUB_USER: 'matao0214'
 
 options:
   logging: CLOUD_LOGGING_ONLY

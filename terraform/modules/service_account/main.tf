@@ -15,6 +15,12 @@ resource "google_project_iam_member" "cloud_build_admin" {
   member  = "serviceAccount:${google_service_account.cloud_build.email}"
 }
 
+resource "google_project_iam_member" "cloud_build_secret_accessor" {
+  project = var.project_id
+  role    = "roles/secretmanager.secretAccessor"
+  member  = "serviceAccount:${google_service_account.cloud_build.email}"
+}
+
 resource "google_project_iam_member" "cloud_sql_connect" {
   project = var.project_id
   role    = "roles/cloudsql.admin"
