@@ -9,12 +9,12 @@ spec:
       labels:
         app: frontend
       annotations:
-        redeployTimestamp: "$(date)"
+        redeployTimestamp: "2025-09-03T23:28:05"
     spec:
       containers:
       - name: frontend
         # gcrのイメージを指定
-        image: asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-frontend:latest
+        image: asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-frontend:711f95f
         imagePullPolicy: Always
         ports:
         - containerPort: 80
