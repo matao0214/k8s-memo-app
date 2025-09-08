@@ -1,0 +1,10 @@
+grafana:
+  adminUser: admin
+  adminPassword: admin123
+  service:
+    type: LoadBalancer
+  ingress:
+    enabled: false
+  sidecar:
+    dashboards:
+      enabled: true

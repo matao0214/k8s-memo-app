@@ -60,15 +60,16 @@ sequenceDiagram
 
 ---
 
-## 実装ポイント
+## 使用技術
 
-| カテゴリ | 内容 |
-|----------|------|
-| 🚀 **インフラ自動化 (IaC)** | - **Terraform** による GCP リソースのコード管理で、**誰でも再現可能な環境構築**を実現<br>- **モジュール化**により、ネットワーク / DB / GKE などを再利用可能にし、保守性を向上<br>- 環境変数を切り替えることで **開発・検証・本番環境を統一した手順でデプロイ可能** |
-| 🔄 **CI/CD パイプライン (GitOps)** | - **GitHub** に push すると **Cloud Build** が Docker イメージを自動ビルド<br>- **Artifact Registry** にイメージを格納し、`deployment.yaml` のタグを自動更新<br>- **Argo CD** が変更を検知し、自動的に Kubernetes にデプロイ<br>- CI (ビルド/テスト) と CD (デプロイ) を分離し、**セキュリティ性と拡張性を確保** |
-| ⚡ **ワンコマンド環境構築** | - `make up` などの **単一コマンドでクラウド環境からアプリまで構築可能**<br>- 開発者が環境準備に時間を割かず、すぐに開発に集中できる **DX (Developer Experience)** を重視 |
-| 🛡 **セキュリティ & 品質管理** | - **Trivy** によるコンテナイメージの脆弱性スキャン<br>- **Checkov** による Terraform コードのセキュリティチェック<br>- **pre-commit hooks** による静的解析・コード整形を自動化し、**品質を担保**<br>- 開発初期から **DevSecOps を意識した設計** |
-| 🌐 **モダンな Web アプリケーション** | - **Next.js**: SSR/SSG 対応のモダンフロントエンド<br>- **Ruby on Rails**: API サーバー (業務ロジックを担当)<br>- **PostgreSQL (Cloud SQL)**: スケーラブルで安定した RDBMS<br>- GCP マネージドサービスと統合し、**運用コストを削減しつつ拡張性を確保** |
+| カテゴリ | 使用技術 / ツール |
+|----------|----------------|
+| 🚀 **インフラ基盤** | GCP (VPC, Cloud SQL, GKE Autopilot), Kubernetes |
+| 🛠 **インフラ管理** | Terraform, Terraform Module, Helm, Helmfile |
+| 🔄 **CI/CD パイプライン (GitOps)** | GitHub, Cloud Build, Artifact Registry, Argo CD |
+| 🛡 **セキュリティ & 品質管理** | Trivy, Checkov, pre-commit hooks |
+| 🌐 **アプリケーション** | Next.js, Ruby on Rails, PostgreSQL (Cloud SQL), Docker |
+
 ---
 
 ## クイックスタート
