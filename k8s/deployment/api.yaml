@@ -17,7 +17,7 @@ spec:
       serviceAccountName: cloud-sql-proxy
       containers:
       - name: api
-        image: asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-api:latest
+        image: asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-api:3ad132b
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
