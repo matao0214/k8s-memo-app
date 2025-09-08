@@ -4,9 +4,7 @@
 
 GCP・Terraform・Kubernetes・CI/CD を活用した、インフラ自動化 ＆ メモWebアプリ  
 
-**コマンド1つでクラウド環境構築・アプリデプロイが可能**な設計です
-
-クラウド上のWebアプリで何か試したい時、すぐに環境構築できて、不要になったら簡単にクリーンアップできます。
+コマンド1つでクラウド環境構築・アプリデプロイが可能
 
 ---
 
@@ -14,36 +12,63 @@ GCP・Terraform・Kubernetes・CI/CD を活用した、インフラ自動化 ＆
 
 ```mermaid
 graph LR;
-    A((Client)) ---> |Service経由|B["Frontend Pod (Next.js)"];
-    subgraph "GCP (Terraform管理)"
+    client((Client)) ---> service(Service)
+    subgraph "GCP (Terraform)"
       subgraph GKE Autopilot
-        B --> C["API Pod (Ruby on Rails)"]
+        service --> frontend(["Frontend (Nextjs)"])
+        frontend <--> api(["API (Ruby on Rails)"])
+        argocd([ArgoCD]) e1@--> api
+        argocd e2@--> frontend
+        e1@{ animation: fast }
+        e2@{ animation: fast }
       end
-      C <--> D["Cloud SQL (PostgreSQL)"]
-      E["Cloud Build (CI/CD)"] --> B
-      E --> C
-      E --> G[Artifact Registry]
+      api <--> db[("Cloud SQL")]
+      cloudbuild["Cloud Build"] --> |Push image|artifact[Artifact Registry]
     end
-    F(GitHub) --> E
-    H((Developer)) --> F
+    developer((Developer)) --> github(GitHub)
+    github --> argocd
+    github --> cloudbuild
+
 ```
 
 ---
 
-## ポイント
+## CI/CD パイプライン
 
-- **インフラ自動化**  
-  Terraform で GCP リソースをコード管理。  
+### アプリケーション
 
-- **CI/CD パイプライン**  
-  GitHub 連携で Cloud Build が自動ビルド＆デプロイ。
+```mermaid
+sequenceDiagram
+    participant Dev as Developer
+    participant GH as GitHub
+    participant CB as Cloud Build
+    participant Argo as Argo CD
+    participant K8s as Kubernetes
 
-- **コマンド1つで環境構築**  
-  クラウド環境からアプリまで自動構築。
+    Dev->>GH: コード変更を push
+    GH->>CB: トリガー発火
 
-- **セキュリティ・品質管理**  
-  Trivy/Checkov による IaC 脆弱性チェック、pre-commit による静的解析。
+    CB->>CB: Docker イメージをbuild・push
+    CB->>GH: manifestのイメージタグを更新して push
 
+    GH->>Argo: イメージタグ更新された manifest 検知
+    Argo->>K8s: manifest を apply
+```
+
+### インフラ
+実装予定
+
+---
+
+## 実装ポイント
+
+| カテゴリ | 内容 |
+|----------|------|
+| 🚀 **インフラ自動化 (IaC)** | - **Terraform** による GCP リソースのコード管理で、**誰でも再現可能な環境構築**を実現<br>- **モジュール化**により、ネットワーク / DB / GKE などを再利用可能にし、保守性を向上<br>- 環境変数を切り替えることで **開発・検証・本番環境を統一した手順でデプロイ可能** |
+| 🔄 **CI/CD パイプライン (GitOps)** | - **GitHub** に push すると **Cloud Build** が Docker イメージを自動ビルド<br>- **Artifact Registry** にイメージを格納し、`deployment.yaml` のタグを自動更新<br>- **Argo CD** が変更を検知し、自動的に Kubernetes にデプロイ<br>- CI (ビルド/テスト) と CD (デプロイ) を分離し、**セキュリティ性と拡張性を確保** |
+| ⚡ **ワンコマンド環境構築** | - `make up` などの **単一コマンドでクラウド環境からアプリまで構築可能**<br>- 開発者が環境準備に時間を割かず、すぐに開発に集中できる **DX (Developer Experience)** を重視 |
+| 🛡 **セキュリティ & 品質管理** | - **Trivy** によるコンテナイメージの脆弱性スキャン<br>- **Checkov** による Terraform コードのセキュリティチェック<br>- **pre-commit hooks** による静的解析・コード整形を自動化し、**品質を担保**<br>- 開発初期から **DevSecOps を意識した設計** |
+| 🌐 **モダンな Web アプリケーション** | - **Next.js**: SSR/SSG 対応のモダンフロントエンド<br>- **Ruby on Rails**: API サーバー (業務ロジックを担当)<br>- **PostgreSQL (Cloud SQL)**: スケーラブルで安定した RDBMS<br>- GCP マネージドサービスと統合し、**運用コストを削減しつつ拡張性を確保** |
 ---
 
 ## クイックスタート
@@ -59,7 +84,7 @@ make setup-gcp
 ```
 20分程度で[システム構成図](#システム構成図)の環境が構築されます。
 
-ログに出力される`Application URL:`からアプリケーションにアクセス可能。
+ログに出力される`Application URL:`、`Argocd URL:`からアプリケーションおよびArgoCDへアクセス可能。
 
 #### クリーンアップ
 
@@ -67,7 +92,9 @@ make setup-gcp
 make clean-gcp
 ```
 
-### ローカル開発環境の構築
+### ローカル開発環境
+
+#### 構築
 
 docker環境を構築
 
@@ -77,52 +104,20 @@ make up
 
 アクセス: [http://localhost:3001](http://localhost:3001)
 
----
-
-## 手動でのデプロイ手順
-
-### GKE 認証
-
-```bash
-gcloud container clusters get-credentials example-autopilot-cluster --region asia-northeast1 --project matao0214-demo
-```
-
-### イメージビルド＆プッシュ
-
-#### Frontend
-
-```bash
-cd frontend/
-docker build -t memo-app-frontend-prod:latest -f Dockerfile.prod .
-docker tag memo-app-frontend-prod asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-frontend:latest
-docker push asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-frontend:latest
-```
-
-#### API
-
-```bash
-cd api/
-docker build -t memo-app-api-prod:latest -f Dockerfile.prod .
-docker tag memo-app-api-prod:latest asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-api:latest
-docker push asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-api:latest
-```
-
-### Kubernetes へデプロイ
-
-```bash
-cd k8s/
-kubectl apply -f ./deployment/frontend.yaml
-kubectl apply -f ./service/frontend.yaml
-kubectl apply -f ./deployment/api.yaml
-kubectl apply -f ./service/api.yaml
-```
-
-### DB マイグレーション
+#### DB マイグレーション
 
 ```bash
 kubectl get pod
 kubectl exec -it ${pod_name} -- /bin/bash
+rails db:create db:migrate
+
+# 本番環境の場合
 rails db:create db:migrate RAILS_ENV=production
+```
+
+#### クリーンアップ
+```bash
+make down
 ```
 
 ---
@@ -130,12 +125,12 @@ rails db:create db:migrate RAILS_ENV=production
 ## IaC セキュリティチェック
 
 ```bash
+brew install trivy
+brew install checkov
+
 cd terraform
 
-brew install trivy
 trivy config ./main.tf
-
-brew install checkov
 checkov --file ./main.tf
 ```
 
@@ -170,7 +165,3 @@ Repo URL を貼り付け ***terraform/modules/cloud_build/my-github-repo-url.txt
 ***Example: https://github.com/matao0214/k8s-memo-app.git***
 
 ---
-
-## 補足
-
-- 詳細なセットアップ手順は `script/setup.sh` 内に記載しています。

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e  # Stop on error
-set -x  # Display executed commands
 
 # terraform applyでリソース作成
 cd terraform/prod
@@ -30,27 +29,13 @@ kubectl apply -f k8s/argocd/application.yaml
 
 # Run Cloud Build
 echo "---------- Start Cloudbuild memo-app-api and memo-app-frontend----------"
-API_BUILD_ID=$(gcloud builds triggers run memo-app-api --region=asia-east1 --branch=main --format='value(id)')
-FRONTEND_BUILD_ID=$(gcloud builds triggers run memo-app-frontend --region=asia-east1 --branch=main --format='value(id)')
-
-# 直前のmemo-app-apiとmemo-app-frontendのCloudbuild のステータスチェック。10秒ごとに確認して、成功したら次へ進む
-while true; do
-  API_STATUS=$(gcloud builds describe $API_BUILD_ID --format='value(status)')
-  FRONTEND_STATUS=$(gcloud builds describe $FRONTEND_BUILD_ID --format='value(status)')
-  if [[ "$API_STATUS" == "SUCCESS" && "$FRONTEND_STATUS" == "SUCCESS" ]]; then
-    echo "---------- Both Cloudbuilds succeeded ----------"
-    break
-  elif [[ "$API_STATUS" == "FAILURE" || "$FRONTEND_STATUS" == "FAILURE" ]]; then
-    echo "---------- One of the Cloudbuilds failed ----------"
-    exit 1
-  fi
-  echo "---------- Cloudbuilds are still running... ----------"
-  sleep 10
-done
+gcloud builds triggers run memo-app-api --region=asia-east1 --branch=main
+gcloud builds triggers run memo-app-frontend --region=asia-east1 --branch=main
+echo "---------- This may take about 3 minutes. Please wait... ----------"
 
 # アプリケーションとArgoCDのURLを表示
 echo "---------- Application URL: http://$(kubectl get service frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}') ----------"
-echo "---------- Argocd URL: http://$(kubectl get service argocd-server -o jsonpath='{.status.loadBalancer.ingress[0].ip}') ----------"
+echo "---------- Argocd URL: http://$(kubectl get service -n argocd argocd-server -o jsonpath='{.status.loadBalancer.ingress[0].ip}') ----------"
 # Argocd ログイン情報
 echo "---------- Argocd admin user: admin ----------"
-echo "---------- Argocd admin password: $(kubectl get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 --decode) ----------"
+echo "---------- Argocd admin password: $(kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 --decode) ----------"

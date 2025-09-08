@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x  # Display executed commands
-
 helmfile destroy -f k8s/helmfile.yaml
 
 cd terraform/prod
