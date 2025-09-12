@@ -28,11 +28,10 @@ steps:
         git config --global user.email "cloudbuild@example.com"
         git config --global user.name "cloudbuild"
         git checkout main 2>/dev/null || git checkout -b main
-        git pull
         git add k8s/deployment/api.yaml
         git commit -m "Update api image tag to ${SHORT_SHA} [ci skip]" || echo "No changes to commit"
         git remote set-url origin https://$_GITHUB_USER:$$GITHUB_TOKEN@github.com/matao0214/k8s-memo-app.git
-        git push origin main
+        git push origin main --force
     secretEnv:
       - 'GITHUB_TOKEN'
 
