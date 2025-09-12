@@ -14,7 +14,7 @@ spec:
       containers:
       - name: frontend
         # gcrのイメージを指定
-        image: asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-frontend:5a16f32
+        image: asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-frontend:3a04427
         imagePullPolicy: Always
         ports:
         - containerPort: 80
