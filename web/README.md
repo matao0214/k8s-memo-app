@@ -1,4 +1,4 @@
-# Go API (api)
+# Go Web API (web)
 
 このディレクトリはGo（Gin）で実装されたAPIサーバです。
 

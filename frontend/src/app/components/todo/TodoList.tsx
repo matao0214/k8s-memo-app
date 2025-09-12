@@ -1,28 +1,25 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import TodoPost from './TodoPost';
-import TodoDelete from './TodoDelete';
-import getData from './TodoGetData';
-import TodoEdit from './TodoEdit';
+import { fetchTodos, addTodo, updateTodo, deleteTodo as deleteTodoApi } from './api';
 
 // Todoの型定義
 type Todo = {
-  id: string;
+  id: number;
   title: string;
-  completed: boolean;
+  done: boolean;
 };
 
 const TodoComponent = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [title, setTitle] = useState('');
   const [editTitle, setEditTitle] = useState(''); // 編集用のタイトル
-  const [editId, setEditId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<number | null>(null);
 
   // Todoリストを取得
   useEffect(() => {
-    getData().then(data => {
-      setTodos(data);
+    fetchTodos().then(data => {
+      setTodos(Array.isArray(data) ? data : []);
     });
   }, []);
 
@@ -30,8 +27,7 @@ const TodoComponent = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response =await TodoPost(title)
-      const newTodo = await response.json();
+      const newTodo = await addTodo(title);
       setTodos([...todos, newTodo]); // Todoリストを更新
       setTitle('');
     } catch (error) {
@@ -40,26 +36,26 @@ const TodoComponent = () => {
   };
 
   // Todoを削除する処理
-  const deleteTodo = async (id: string) => {
+  const deleteTodo = async (id: number) => {
     try {
-      TodoDelete(id)
+      await deleteTodoApi(id);
       setTodos(todos.filter(todo => todo.id !== id)); // UIからも削除
     } catch (error) {
       console.error('Failed to delete todo:', error);
     }
-  };
+  } 
 
   // Todo編集処理
-  const editTodo = async (id: string) => {
+  const editTodo = async (id: number) => {
     try {
-      await TodoEdit(id, editTitle);
-      setTodos(todos.map(todo => todo.id === id ? { ...todo, title: editTitle } : todo));
+      const updated = await updateTodo({ id, title: editTitle, done: false });
+      setTodos(todos.map(todo => todo.id === id ? updated : todo));
       setEditId(null);
       setEditTitle(''); // 編集フォームのリセット
     } catch (error) {
       console.error('Failed to edit todo:', error);
     }
-  };
+  } 
 
   return (
     <div className="container mx-auto p-4">
@@ -77,29 +73,29 @@ const TodoComponent = () => {
       </form>
       <ul className="list-disc pl-5">
       {todos.map(todo => (
-	  <li key={todo.id} className="mb-2">
-	    {editId === todo.id ? (
-	      <input
-		type="text"
-		value={editTitle}
-		onChange={(e) => setEditTitle(e.target.value)}
-	      />
-	    ) : (
-	      <span className="text-grey-darker">{todo.title}</span>
-	    )}
-	    <button onClick={() => { setEditId(todo.id); setEditTitle(todo.title); }} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded ml-2">
-	      Edit
-	    </button>
-	    <button onClick={() => deleteTodo(todo.id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2">
-	      Delete
-	    </button>
-	    {editId === todo.id && (
-	      <button onClick={() => editTodo(todo.id)} className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded ml-2">
-		Save
-	      </button>
-	    )}
-	  </li>
-	))}
+          <li key={todo.id} className="mb-2">
+            {editId === todo.id ? (
+              <input
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+              />
+            ) : (
+              <span className="text-grey-darker">{todo.title}</span>
+            )}
+            <button onClick={() => { setEditId(todo.id); setEditTitle(todo.title); }} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded ml-2">
+              Edit
+            </button>
+            <button onClick={() => deleteTodo(todo.id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-2">
+              Delete
+            </button>
+            {editId === todo.id && (
+              <button onClick={() => editTodo(todo.id)} className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded ml-2">
+                Save
+              </button>
+            )}
+          </li>
+        ))}
       </ul>
     </div>
   );

@@ -33,7 +33,6 @@ echo "POSTGRES_USER=$(echo $terraform_output | jq -r '.db_user_name.value')" >> 
 echo "POSTGRES_PASSWORD=$(echo $terraform_output | jq -r '.db_user_password.value')" >> api/config/secret/prod.env
 echo "INSTANCE_CONNECTION_NAME=$(echo $terraform_output | jq -r '.db_connection_name.value')" >> api/config/secret/prod.env
 echo "POSTGRES_HOST=127.0.0.1" >> api/config/secret/prod.env
-echo "SECRET_KEY_BASE=$(openssl rand -hex 64)" >> api/config/secret/prod.env
 echo "CORS_ALLOWED_ORIGINS=http://$(kubectl get service frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" >> api/config/secret/prod.env
 
 # KubernetesのSecretを作成

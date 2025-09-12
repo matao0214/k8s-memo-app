@@ -42,12 +42,6 @@ spec:
             secretKeyRef:
               name: api-secret
               key: POSTGRES_HOST
-        # rails認証用のキーを指定
-        - name: SECRET_KEY_BASE
-          valueFrom:
-            secretKeyRef:
-              name: api-secret
-              key: SECRET_KEY_BASE
         # フロントエンドのURLを指定。port=80の場合はportの記載省力する。
         - name: CORS_ALLOWED_ORIGINS
           valueFrom:

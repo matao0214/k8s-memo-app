@@ -16,7 +16,7 @@ graph LR;
     subgraph "GCP (Terraform)"
       subgraph GKE Autopilot
         service --> frontend(["Frontend (Nextjs)"])
-        frontend <--> api(["API (Ruby on Rails)"])
+        frontend <--> api(["API (Go)"])
         argocd([ArgoCD]) e1@--> api
         argocd e2@--> frontend
         e1@{ animation: fast }
@@ -56,6 +56,7 @@ sequenceDiagram
 ```
 
 ### インフラ
+
 実装予定
 
 ---
@@ -68,7 +69,7 @@ sequenceDiagram
 | 🛠 **インフラ管理** | Terraform, Terraform Module, Helm, Helmfile |
 | 🔄 **CI/CD パイプライン (GitOps)** | GitHub, Cloud Build, Artifact Registry, Argo CD |
 | 🛡 **セキュリティ & 品質管理** | Trivy, Checkov, pre-commit hooks |
-| 🌐 **アプリケーション** | Next.js, Ruby on Rails, PostgreSQL (Cloud SQL), Docker |
+| 🌐 **アプリケーション** | Next.js, Go (Gin), PostgreSQL (Cloud SQL), Docker |
 
 ---
 
@@ -83,11 +84,12 @@ sequenceDiagram
 ```bash
 make setup-gcp
 ```
+
 20分程度で[システム構成図](#システム構成図)の環境が構築されます。
 
 ログに出力される`Application URL:`、`Argocd URL:`からアプリケーションおよびArgoCDへアクセス可能。
 
-#### クリーンアップ
+#### GCP環境のクリーンアップ
 
 ```bash
 make clean-gcp
@@ -105,18 +107,8 @@ make up
 
 アクセス: [http://localhost:3001](http://localhost:3001)
 
-#### DB マイグレーション
-
-```bash
-kubectl get pod
-kubectl exec -it ${pod_name} -- /bin/bash
-rails db:create db:migrate
-
-# 本番環境の場合
-rails db:create db:migrate RAILS_ENV=production
-```
-
 #### クリーンアップ
+
 ```bash
 make down
 ```
@@ -151,18 +143,19 @@ touch terraform/modules/cloud_build/my-github-repo-url.txt
 ```
 
 ### 2.Github access token の作成
+
 1. URL: [GitHub Tokens](https://github.com/settings/tokens).
 1. `Token (classic)`からtokenを作成
 1. tokenを貼り付け ***terraform/modules/cloud_build/my-github-token.txt***
 
-
 ### 3.Github install ID の確認
+
 1. URL: [GitHub App Installations](https://github.com/apps/google-cloud-build/installations/select_target).
 1. アクセス先URLの末尾の数字を貼り付け ***terraform/modules/cloud_build/my-github-app-installation-id.txt***
 
-
 ### 4. Repo URL を確認
+
 Repo URL を貼り付け ***terraform/modules/cloud_build/my-github-repo-url.txt***  
-***Example: https://github.com/matao0214/k8s-memo-app.git***
+***Example: [https://github.com/matao0214/k8s-memo-app.git](https://github.com/matao0214/k8s-memo-app.git)***
 
 ---

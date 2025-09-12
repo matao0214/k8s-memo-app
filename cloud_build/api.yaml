@@ -6,14 +6,6 @@ steps:
            '-f', 'api/Dockerfile.prod',
            'api']
 
-  # Rubocop Check
-  - name: 'gcr.io/cloud-builders/docker'
-    args: [
-      'run', '--rm',
-      'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-api:${SHORT_SHA}',
-      'sh', '-c', 'bundle install && bundle exec rubocop'
-    ]
-
   # Docker Push
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 
@@ -42,24 +34,6 @@ steps:
         git push origin main
     secretEnv:
       - 'GITHUB_TOKEN'
-
-  # GKEクラスタの認証情報を取得
-  - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['container', 'clusters', 'get-credentials', '${_CLOUDSDK_CONTAINER_CLUSTER}', '--region', '${_CLOUDSDK_COMPUTE_REGION}', '--project', '${PROJECT_ID}']
-
-  # DB Create & Migrate
-  - name: 'gcr.io/cloud-builders/kubectl'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - |
-        POD_NAME=""
-        while [ -z "$$POD_NAME" ]; do
-          POD_NAME=$$(kubectl get pods -l app=api -o jsonpath="{.items[0].metadata.name}" --field-selector=status.phase=Running)
-          echo "Waiting for Pod to be ready..."
-          sleep 5
-        done
-        kubectl exec -it $$POD_NAME -- rails db:create db:migrate RAILS_ENV=production
 
 availableSecrets:
   secretManager:
