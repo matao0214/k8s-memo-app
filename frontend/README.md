@@ -1,3 +1,5 @@
+# Memo App Frontend
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
@@ -35,13 +37,17 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-
 ## Deploy
+
 ### Push imaga to Artifact Registry
-docker build -t memo-app-frontend-p:latest -f Dockerfile.prod .      
+
+docker build -t memo-app-frontend-p:latest -f Dockerfile.prod .
+
 docker tag memo-app-frontend-prod asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-frontend:latest
 docker push asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-frontend:latest
+
 ### Apply for GKE
+
 cd k8s/
 kubectl apply -f frontend-deployment.yaml
 kubectl apply -f frontend-service.yaml
