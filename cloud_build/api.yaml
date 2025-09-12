@@ -3,7 +3,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build',
            '-t', 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/docker/memo-app-api:${SHORT_SHA}', 
-           '-f', 'api/Dockerfile.prod',
+           '-f', 'api/Dockerfile',
            'api']
 
   # Docker Push
