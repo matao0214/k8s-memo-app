@@ -10,7 +10,7 @@ steps:
       - '-c'
       - |
         API_URL=$$(kubectl get service api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-        echo "http://$$API_URL:3000" > /workspace/api-url.txt
+        echo "http://$$API_URL:8080" > /workspace/api-url.txt
         echo "API_URL: $$(cat /workspace/api-url.txt)"
 
   # Docker Build
