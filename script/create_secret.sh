@@ -28,20 +28,20 @@ echo "---------- Finish setting frontend external IP ----------"
 
 # 環境変数の定義を作成
 echo "---------- Create prod env file ----------"
-echo "POSTGRES_DB=$(echo $terraform_output | jq -r '.db_name.value')" > api/config/secret/prod.env
-echo "POSTGRES_USER=$(echo $terraform_output | jq -r '.db_user_name.value')" >> api/config/secret/prod.env
-echo "POSTGRES_PASSWORD=$(echo $terraform_output | jq -r '.db_user_password.value')" >> api/config/secret/prod.env
-echo "INSTANCE_CONNECTION_NAME=$(echo $terraform_output | jq -r '.db_connection_name.value')" >> api/config/secret/prod.env
-echo "POSTGRES_HOST=127.0.0.1" >> api/config/secret/prod.env
-echo "CORS_ALLOWED_ORIGINS=http://$(kubectl get service frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" >> api/config/secret/prod.env
+echo "POSTGRES_DB=$(echo $terraform_output | jq -r '.db_name.value')" > api/secret/prod.env
+echo "POSTGRES_USER=$(echo $terraform_output | jq -r '.db_user_name.value')" >> api/secret/prod.env
+echo "POSTGRES_PASSWORD=$(echo $terraform_output | jq -r '.db_user_password.value')" >> api/secret/prod.env
+echo "INSTANCE_CONNECTION_NAME=$(echo $terraform_output | jq -r '.db_connection_name.value')" >> api/secret/prod.env
+echo "POSTGRES_HOST=127.0.0.1" >> api/secret/prod.env
+echo "CORS_ALLOWED_ORIGINS=http://$(kubectl get service frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" >> api/secret/prod.env
 
 # KubernetesのSecretを作成
 echo "---------- Create kube secret ----------"
-kubectl create secret generic api-secret --from-env-file ./api/config/secret/prod.env --dry-run=client -o yaml | kubectl apply -f -
+kubectl create secret generic api-secret --from-env-file ./api/secret/prod.env --dry-run=client -o yaml | kubectl apply -f -
 
 # デモファイルを確認
 echo "---------- Check prod file ----------"
 echo "---------- If empty item, rerun this scrpt. ----------"
-cat api/config/secret/prod.env
+cat api/secret/prod.env
 
 echo "---------- Finish create secret shell script ----------"

@@ -20,7 +20,7 @@ spec:
         image: asia-northeast1-docker.pkg.dev/matao0214-demo/docker/memo-app-api:d2bb1fb
         imagePullPolicy: Always
         ports:
-        - containerPort: 3000
+        - containerPort: 8080
         env:
         - name: POSTGRES_DB
           valueFrom:

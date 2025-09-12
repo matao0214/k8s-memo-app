@@ -42,9 +42,8 @@
 !/api/tmp/storage/
 !/api/tmp/storage/.keep
 
-# Ignore master key for decrypting credentials and more.
-/api/config/master.key
-/api/config/secret/
+# credentials
+/api/secret/*
 
 ###################################################### 
 ### frontend ###
